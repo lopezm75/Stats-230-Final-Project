@@ -1,0 +1,83 @@
+---
+title: "Final Project"
+author: "Manuel Lopez"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(effects)
+Evehicles <- read_csv("Electric_Vehicle_Population_Data.csv")
+```
+
+**Question**
+
+1\) Is there a correlation between the Model Year and Electric Range?
+
+2\) Do different electric vehicle companies produce models with different electric ranges?
+
+**Descriptive Analysis**
+
+Histogram of Electric Range:
+
+```{r}
+Evehicles |>
+  ggplot(aes(x = `Electric Range`)) +
+  geom_histogram() +
+  facet_wrap(~Make)
+```
+
+Boxplot of MSRP:
+
+```{r}
+Evehicles |>
+  ggplot(aes(x = `Base MSRP`, y = `Electric Vehicle Type`)) +
+  geom_boxplot() 
+```
+
+Scatterplot of Electric Range vs MSRP:
+
+```{r}
+Evehicles |>
+  ggplot(aes(x = "Base MSRP",
+             y = "Electric Range")) +
+  geom_point()
+```
+
+Summary:
+
+```{r}
+Evehicles |>
+  group_by(Make) |>
+  summarize(mean = mean(`Base MSRP`, na.rm = TRUE),
+            median = median(`Base MSRP`, na.rm = TRUE),
+            min = min(`Base MSRP`, na.rm = TRUE),
+            max = max(`Base MSRP`, na.rm = TRUE),
+            sd = sd(`Base MSRP`, na.rm = TRUE))
+```
+
+**Inferential Statistics**
+
+Question 1: Is there a correlation between the Model Year and Electric Range?
+
+```{r}
+cor.test(Evehicles$`Electric Range`, 
+          Evehicles$`Model Year`)
+```
+
+Question 2: Do different electric vehicle companies produce models with different electric ranges?
+
+```{r}
+anova_result <- aov(Evehicles$`Electric Range` ~ 
+                    Evehicles$`Make`, data = Evehicles)
+summary(anova_result)
+```
+
+**Conclusion 1**
+
+Newer EV models typically have shorter electric ranges, according to the correlation analysis between Model Year and Electric Range, which showed a statistically significant negative link with a correlation coefficient of -0.5323 and a p-value \< 2.2e-16. This trend suggests possible industry developments, such as a focus on efficiency, cost, or urban mobility, rather than maximizing range, which runs counter to the conventional wisdom that technology advancements will result in longer ranges. The narrow confidence interval (-0.5352 to -0.5294) and high absolute t-value (-307.86) further support the validity of this result. To learn more about the variables behind this pattern, future investigations could look at trends unique to a given manufacturer, developments in battery technology, or shifts in consumer desires.
+
+**Conclusion 2**
+
+The analysis's F-value of 484.7 and incredibly low p-value (\<2e-16) demonstrate that electric vehicle ranges differ greatly amongst manufacturers. These findings show that variations in electric range between manufacturers are statistically significant rather than random. The residual sum of squares (1.529e+09) explains the remaining variability within each group, although the manufacturers' sum of squares (1.392e+08) indicates a significant contribution to the overall variation. The difference is further emphasized by the mean square values, which show that manufacturers have an average variance of 3,093,130 while individual automobiles have an average variation of 6,382. These results imply that certain businesses give long-range EVs priority, while others concentrate on price, city driving, or other technological factors.
